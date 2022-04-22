@@ -2,9 +2,17 @@ package com.example.myapplication
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 
-class InventoryViewModel(private val itemDao: GitHubDao) : ViewModel() {
+class InventoryViewModel(
+    private val itemDao: GitHubDao
+    ) : ViewModel() {
+    val pagingDataFlow: Flow<PagingData<GitHubUser>>
 
+    init {
+        
+    }
 }
 
 class InventoryViewModelFactory(private val itemDao: GitHubDao) : ViewModelProvider.Factory {
