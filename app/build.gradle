@@ -68,6 +68,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
+    implementation("androidx.fragment:fragment-ktx:1.4.1")
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation("androidx.recyclerview:recyclerview:1.2.1")
