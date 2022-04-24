@@ -3,20 +3,15 @@ package com.example.myapplication
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "github_user_table")
 data class GitHubUser(
     @PrimaryKey
-    @ColumnInfo(name = "id")
-    var id : Long,
-    @ColumnInfo(name = "login")
-    val login : String,
-    @ColumnInfo(name = "node_id")
-    var node_id : String,
-    @ColumnInfo(name = "avatar_url")
-    var avatar_url : String,
-    @ColumnInfo(name = "html_url")
-    var html_url : String,
-    @ColumnInfo(name = "")
-    var repos_url : String,
+    @field:SerializedName("id") val id : Long,
+    @field:SerializedName("login") val login : String,
+    @field:SerializedName("node_id") val node : String,
+    @field:SerializedName("avatar_url") val avatar : String,
+    @field:SerializedName("html_url") val html : String,
+    @field:SerializedName("repos_url") val repos : String
 )

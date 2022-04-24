@@ -15,5 +15,5 @@ interface GitHubDao {
     suspend fun clearAll(): Int
 
     @Query("SELECT * FROM github_user_table")
-    suspend fun getPagingSource(): PagingSource<Int,GitHubUser>
+    fun getPagingSource(): PagingSource<Int,GitHubUser>
 }

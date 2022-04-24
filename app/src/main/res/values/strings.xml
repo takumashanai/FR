@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="retry">retry</string>
+    <string name="no_results">No results</string>
+    <string name="name">name: %1$s</string>
+    <string name="hint">input start ID</string>
+    <string name="refresh">refresh</string>
 </resources>

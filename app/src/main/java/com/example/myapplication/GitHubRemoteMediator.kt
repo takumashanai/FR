@@ -11,17 +11,16 @@ import java.io.IOException
 
 @ExperimentalPagingApi
 class GitHubRemoteMediator(
-    private val networkService: GitHubAPI,
+    private val networkService: GitHubUserAPI,
     private val database: AppDatabase,
-    private val since: Int
+    private var since: Int
 ) : RemoteMediator<Int, GitHubUser>() {
-    private var loadKeyVault : Int = 1
     override suspend fun load(
         loadType: LoadType, state: PagingState<Int, GitHubUser>
     ): MediatorResult {
         return try {
             val loadKey = when (loadType) {
-                LoadType.REFRESH -> loadKeyVault
+                LoadType.REFRESH -> since
                 LoadType.PREPEND ->
                     return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
@@ -31,25 +30,36 @@ class GitHubRemoteMediator(
                             endOfPaginationReached = true
                         )
                     }
-                    loadKeyVault += 1
-                    loadKeyVault
+                    since += 100
+                    since
                 }
             }
 
             val response = networkService.getGitHubUserData(
-                since = this.since, perPage = loadKeyVault
+                since = loadKey, perPage = 100
             )
+            val endOfPaginationReached = response.isNullOrEmpty()
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     database.gitHubDao().clearAll()
                 }
-
-                response.body()?.let { database.gitHubDao().insertAll(it) }
+                response.forEach { it ->
+                    database.gitHubDao().insert(
+                        GitHubUser(
+                            id = it.id,
+                            login = it.login,
+                            node = it.node,
+                            avatar = it.avatar,
+                            html = it.html,
+                            repos = it.repos
+                        )
+                    )
+                }
             }
 
             MediatorResult.Success(
-                endOfPaginationReached = response.body().isNullOrEmpty()
+                endOfPaginationReached = endOfPaginationReached
             )
         } catch (e: IOException) {
             MediatorResult.Error(e)
