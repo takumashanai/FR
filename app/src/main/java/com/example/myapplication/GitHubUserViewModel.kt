@@ -20,6 +20,9 @@ class GitHubUserViewModel(
     private var _html: String? = null
     val html: String?
         get() = _html
+    private var _avatar: String? = null
+    val avatar: String?
+        get() = _avatar
 
     fun setLogin(login: String){
         _login = login
@@ -27,6 +30,10 @@ class GitHubUserViewModel(
 
     fun setHtml(html: String){
         _html = html
+    }
+
+    fun setAvatar(avatar: String){
+        _avatar = avatar
     }
 
 

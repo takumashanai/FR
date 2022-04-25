@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 import com.example.myapplication.databinding.FragmentDetailBinding
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -41,20 +42,19 @@ class DetailFragment(): Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
-        closeButton = binding.imageView1
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        closeButton.setOnClickListener{
-            parentFragmentManager.beginTransaction().remove(this).commit()
-        }
-
     }
 
     override fun onViewCreated(view:View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
+        closeButton = binding.imageView1
+        closeButton.setOnClickListener{
+            parentFragmentManager.beginTransaction().remove(this).commit()
+        }
         sharedViewModel.login.let {
             val text1 = binding.textView1
             text1.text = it
@@ -91,6 +91,8 @@ class DetailFragment(): Fragment() {
                                     val pieData = PieData(pieDataSet)
                                     val pieChart = binding.pieChart1
                                     pieChart.data = pieData
+                                    //pieChart.anima
+                                    pieChart.setNoDataText("a")
                                     pieChart.legend.isEnabled = false
                                     pieChart.isClickable = true
                                     pieChart.invalidate()
@@ -100,12 +102,7 @@ class DetailFragment(): Fragment() {
                                         override fun onNothingSelected() { }
 
                                         override fun onValueSelected(e: Entry?, h: Highlight?) {
-
-                                            Toast.makeText(
-                                                activity,
-                                                h.toString(),
-                                                Toast.LENGTH_LONG
-                                            ).show()
+                                            //val adapter =
                                         }
                                     })
                                 }
@@ -122,6 +119,13 @@ class DetailFragment(): Fragment() {
                 openUrl(url)
             }
         }
+        /*sharedViewModel.avatar.let{
+            val image2 = binding.imageView2
+            Glide.with(image2.context)
+                .load(it)
+                .circleCrop()
+                .into(image2)
+        }*/
     }
 
     override fun onDestroyView(){

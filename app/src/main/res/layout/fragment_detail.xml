@@ -2,14 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true"
-        android:background="#80000000" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_1"
@@ -93,6 +88,14 @@
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.20"/>
 
+            <!--pie chart bottom-->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_percent_107"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.63"/>
+
             <TextView
                 android:id="@+id/text_view_1"
                 android:layout_width="0dp"
@@ -107,6 +110,19 @@
                 app:layout_constraintStart_toStartOf="@id/guideline_percent_1"
                 app:layout_constraintTop_toTopOf="@id/guideline_percent_103"/>
 
+            <!--https://icons8.com/icon/3tC9EQumUAuq/github-->
+            <ImageView
+                android:id="@+id/image_view_3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@mipmap/icons8_github"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintBottom_toBottomOf="@id/guideline_percent_106"
+                app:layout_constraintEnd_toEndOf="@id/text_view_2"
+                app:layout_constraintStart_toStartOf="@id/guideline_percent_1"
+                app:layout_constraintTop_toTopOf="@id/guideline_percent_105"/>
+
             <TextView
                 android:id="@+id/text_view_2"
                 android:layout_width="0dp"
@@ -116,21 +132,51 @@
                 android:textColor="#0000ff"
                 android:textStyle="bold"
                 android:maxLines="1"
-                android:gravity="center"
+                android:gravity="start"
+                app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintBottom_toBottomOf="@id/guideline_percent_106"
                 app:layout_constraintEnd_toEndOf="@id/guideline_percent_2"
-                app:layout_constraintStart_toStartOf="@id/guideline_percent_1"
+                app:layout_constraintStart_toEndOf="@id/image_view_3"
                 app:layout_constraintTop_toTopOf="@id/guideline_percent_105"/>
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/pie_chart_1"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintBottom_toBottomOf="@id/guideline_percent_101"
+                app:layout_constraintBottom_toBottomOf="@id/guideline_percent_107"
                 app:layout_constraintEnd_toEndOf="@id/guideline_percent_2"
                 app:layout_constraintStart_toStartOf="@id/guideline_percent_1"
-                app:layout_constraintTop_toTopOf="@id/guideline_percent_106"/>
+                app:layout_constraintTop_toTopOf="@id/guideline_percent_106">
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/pie_chart_1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/image_view_2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@null"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintWidth_percent="0.4"
+                    app:layout_constraintBottom_toBottomOf="@id/pie_chart_1"
+                    app:layout_constraintEnd_toEndOf="@id/pie_chart_1"
+                    app:layout_constraintStart_toStartOf="@id/pie_chart_1"
+                    app:layout_constraintTop_toTopOf="@id/pie_chart_1"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#80000000"
+                    android:clickable="true" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
@@ -140,12 +186,25 @@
                 app:layout_constraintStart_toStartOf="@id/guideline_percent_1"
                 app:layout_constraintTop_toTopOf="@id/guideline_percent_101">
 
+                <TextView
+                    android:id="@+id/text_view_3"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintVertical_bias="0"
+                    app:layout_constraintHeight_percent="0.15"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/view1"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
                 <View
                     android:id="@+id/view1"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:background="@color/black"
                     app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintHeight_percent="0.95"
                     app:layout_constraintWidth_percent="0.03"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -155,11 +214,10 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    app:layout_constraintHeight_percent="0.95"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/view1"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/text_view_3"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -109,12 +109,15 @@ class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
         }
     }
 
-    override fun onItemClick(login: String?,html: String?) {
+    override fun onItemClick(login: String?,html: String?,avater: String?) {
         if (login != null) {
             viewModel.setLogin(login)
         }
         if (html != null) {
             viewModel.setHtml(html)
+        }
+        if (avater != null) {
+            viewModel.setAvatar(avater)
         }
     }
 }

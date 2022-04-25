@@ -3,7 +3,7 @@
     <string name="retry">retry</string>
     <string name="no_results">No results</string>
     <string name="name">NAME: %1$s</string>
-    <string name="description">description: %1$s</string>
+    <string name="description">desc: %1$s</string>
     <string name="link"><u>URL: %1$s</u></string>
     <string name="hint">input start ID</string>
     <string name="refresh">refresh</string>

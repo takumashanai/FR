@@ -24,7 +24,7 @@ class GitHubUserAdapter(
     diffCallback
 ) {
     interface ItemClickListener {
-        fun onItemClick(login: String?,html: String?)
+        fun onItemClick(login: String?,html: String?,avatar: String?)
     }
 
     class GitHubUserViewHolder(
@@ -48,7 +48,7 @@ class GitHubUserAdapter(
                     .into(image)
             }
             card.setOnClickListener{
-                itemClickListener.onItemClick(item?.login,item?.html)
+                itemClickListener.onItemClick(item?.login,item?.html,item?.avatar)
                 val detailFragment = DetailFragment()
                 val transaction = activity.supportFragmentManager.beginTransaction()
                 transaction
