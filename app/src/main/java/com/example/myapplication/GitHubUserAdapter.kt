@@ -1,9 +1,12 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -15,19 +18,24 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class GitHubUserAdapter(
-    diffCallback: DiffUtil.ItemCallback<GitHubUser>
+    diffCallback: DiffUtil.ItemCallback<GitHubUser>,
+    private val itemClickListener: ItemClickListener
 ): PagingDataAdapter<GitHubUser, GitHubUserAdapter.GitHubUserViewHolder>(
     diffCallback
 ) {
+    interface ItemClickListener {
+        fun onItemClick(login: String?,html: String?)
+    }
+
     class GitHubUserViewHolder(
-        binding: ItemMainBinding
+        binding: ItemMainBinding,
+        private val itemClickListener: ItemClickListener
     ): RecyclerView.ViewHolder(binding.root) {
+        private val activity = binding.root.context as AppCompatActivity
         private val text = binding.textView1
         private val image = binding.imageView1
         private val card = binding.cardView1
-        private val repositoryAPI by lazy {
-            retrofit.create(GitHubRepositoryAPI::class.java)
-        }
+
         fun bind(item: GitHubUser?){
             item?.login?.let{
                 val name = text.context.getString(R.string.name,it)
@@ -40,25 +48,20 @@ class GitHubUserAdapter(
                     .into(image)
             }
             card.setOnClickListener{
-                item?.login?.let {
-
-                    repositoryAPI.getGitHubRepositoryData(it,"updated","desc",100,1)
-                        .enqueue(object : Callback<Array<GitHubRepositoryResponse>>{
-                        override fun onFailure(call: Call<Array<GitHubRepositoryResponse>>?, t: Throwable?) {
-                            Log.d("fetchItems", "response fail")
-                            Log.d("fetchItems", "throwable :$t")
-                        }
-
-                        override fun onResponse(call: Call<Array<GitHubRepositoryResponse>>?, response: Response<Array<GitHubRepositoryResponse>>) {
-                            if (response.isSuccessful) {
-                                response.body()?.let {
-
-                                }
-                            }
-                        }
-                    })
-                }
+                itemClickListener.onItemClick(item?.login,item?.html)
+                val detailFragment = DetailFragment()
+                val transaction = activity.supportFragmentManager.beginTransaction()
+                transaction
+                    .replace(R.id.container_main_activity,detailFragment)
+                    .addToBackStack(null)
+                    .commit()
             }
+        }
+
+        fun openUrl(url: String){
+            val intent: Intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            activity.startActivity(intent)
         }
     }
 
@@ -68,7 +71,7 @@ class GitHubUserAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GitHubUserViewHolder {
-        return GitHubUserViewHolder(ItemMainBinding.inflate(LayoutInflater.from(parent.context),parent,false))
+        return GitHubUserViewHolder(ItemMainBinding.inflate(LayoutInflater.from(parent.context),parent,false),itemClickListener)
     }
 
     object UserComparator: DiffUtil.ItemCallback<GitHubUser>() {

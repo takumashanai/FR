@@ -3,6 +3,7 @@ package com.example.myapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -19,34 +20,30 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: GitHubUserViewModel
+    private lateinit var pagingData: Flow<PagingData<GitHubUser>>
+    private val viewModel: GitHubUserViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel = ViewModelProvider(
-            this,Injection.provideViewModelFactory(
-                context = this,
-                owner = this
-            )
-        )[GitHubUserViewModel::class.java]
+        pagingData = viewModel.searchGitHubUser(DEFAULT_QUERY)
         binding.bindState(
-            pagingData = viewModel.searchGitHubUser(DEFAULT_QUERY)
+            pagingData = pagingData
         )
     }
 
     override fun onStart() {
         super.onStart()
-        binding.button1.setOnClickListener{
+        /*binding.button1.setOnClickListener{
             binding.editText1.text?.let {
+                pagingData = viewModel.searchGitHubUser(it.toString().toInt())
                 binding.bindState(
-                    pagingData = viewModel.searchGitHubUser(it.toString().toInt())
+                    pagingData = pagingData
                 )
             }
-        }
-
+        }*/
     }
 
     override fun onResume() {
@@ -56,12 +53,15 @@ class MainActivity : AppCompatActivity() {
     private fun ActivityMainBinding.bindState(
         pagingData: Flow<PagingData<GitHubUser>>
     ){
-        val adapter = GitHubUserAdapter(GitHubUserAdapter.UserComparator)
+        val adapter = GitHubUserAdapter(GitHubUserAdapter.UserComparator,this@MainActivity)
         val loadState = GitHubLoadStateAdapter{ adapter.retry() }
         recyclerView1.adapter = adapter.withLoadStateHeaderAndFooter(
             header = loadState,
             footer = loadState
         )
+        swipe1.setOnRefreshListener {
+            adapter.refresh()
+        }
         recyclerView1.layoutManager = LinearLayoutManager(
             this@MainActivity,LinearLayoutManager.VERTICAL,false
         )
@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity() {
             adapter = adapter,
             pagingData = pagingData
         )
-        //swipe1.setOnRefreshListener {  }
     }
 
     private fun ActivityMainBinding.bindList(
@@ -84,7 +83,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-
             adapter.loadStateFlow.collect{ loadState ->
                 userLoadState.loadState = loadState.mediator
                     ?.refresh
@@ -95,6 +93,7 @@ class MainActivity : AppCompatActivity() {
                 recyclerView1.isVisible =  loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
                 progressBar1.isVisible = loadState.mediator?.refresh is LoadState.Loading
                 button1.isVisible = loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
+                swipe1.isRefreshing = loadState.mediator?.refresh !is LoadState.NotLoading
                 val errorState = loadState.source.append as? LoadState.Error
                     ?: loadState.source.prepend as? LoadState.Error
                     ?: loadState.append as? LoadState.Error
@@ -107,6 +106,15 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 }
             }
+        }
+    }
+
+    override fun onItemClick(login: String?,html: String?) {
+        if (login != null) {
+            viewModel.setLogin(login)
+        }
+        if (html != null) {
+            viewModel.setHtml(html)
         }
     }
 }
