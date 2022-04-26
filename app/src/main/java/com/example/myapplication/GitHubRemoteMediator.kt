@@ -49,7 +49,6 @@ class GitHubRemoteMediator(
                         GitHubUser(
                             id = it.id,
                             login = it.login,
-                            node = it.node,
                             avatar = it.avatar,
                             html = it.html,
                             repos = it.repos

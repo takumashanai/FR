@@ -10,7 +10,6 @@ data class GitHubUser(
     @PrimaryKey
     @field:SerializedName("id") val id : Long,
     @field:SerializedName("login") val login : String,
-    @field:SerializedName("node_id") val node : String,
     @field:SerializedName("avatar_url") val avatar : String,
     @field:SerializedName("html_url") val html : String,
     @field:SerializedName("repos_url") val repos : String

@@ -15,7 +15,7 @@
         android:layout_margin="5dp"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        app:cardBackgroundColor="@color/gray"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintDimensionRatio="3:1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <!--icon start-->
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_percent_1"
                 android:layout_width="0dp"
@@ -31,6 +32,7 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.02"/>
 
+            <!--icon end-->
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_percent_2"
                 android:layout_width="0dp"
@@ -38,6 +40,7 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.28"/>
 
+            <!--name start-->
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_percent_3"
                 android:layout_width="0dp"
@@ -45,6 +48,7 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.32"/>
 
+            <!--name end-->
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_percent_4"
                 android:layout_width="0dp"
@@ -52,6 +56,7 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.98"/>
 
+            <!--name top-->
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_percent_101"
                 android:layout_width="0dp"
@@ -59,6 +64,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.1"/>
 
+            <!--name bottom-->
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_percent_102"
                 android:layout_width="0dp"
@@ -66,15 +72,47 @@
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.4"/>
 
+            <!--url top-->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_percent_103"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5"/>
+
+            <!--url bottom-->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_percent_104"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.8"/>
+
+
             <TextView
                 android:id="@+id/text_view_1"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:autoSizeTextType="uniform"
-                android:text="@string/name"
+                android:text="@string/init_name"
                 android:maxLines="1"
+                android:textColor="@color/black"
                 app:layout_constraintTop_toTopOf="@id/guideline_percent_101"
                 app:layout_constraintBottom_toBottomOf="@id/guideline_percent_102"
+                app:layout_constraintStart_toStartOf="@id/guideline_percent_3"
+                app:layout_constraintEnd_toEndOf="@id/guideline_percent_4"/>
+
+            <TextView
+                android:id="@+id/text_view_2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/init_link"
+                android:maxLines="1"
+                android:textColor="#0000ff"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="@id/guideline_percent_103"
+                app:layout_constraintBottom_toBottomOf="@id/guideline_percent_104"
                 app:layout_constraintStart_toStartOf="@id/guideline_percent_3"
                 app:layout_constraintEnd_toEndOf="@id/guideline_percent_4"/>
 

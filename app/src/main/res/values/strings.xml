@@ -2,9 +2,13 @@
     <string name="app_name">My Application</string>
     <string name="retry">retry</string>
     <string name="no_results">No results</string>
-    <string name="name">NAME: %1$s</string>
-    <string name="description">desc: %1$s</string>
+    <string name="init_name">Name:</string>
+    <string name="init_link">URL:</string>
+    <string name="name">Name: %1$s</string>
+    <string name="description">Desc: %1$s</string>
+    <string name="language">Language: %1$s</string>
+    <string name="item">・ %1$s</string>
+    <string name="init_language">language:</string>
     <string name="link"><u>URL: %1$s</u></string>
-    <string name="hint">input start ID</string>
     <string name="refresh">refresh</string>
 </resources>

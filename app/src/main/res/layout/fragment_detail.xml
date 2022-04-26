@@ -6,6 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:background="#7F000000"/>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_1"
         android:layout_width="0dp"
@@ -161,19 +168,12 @@
                     android:id="@+id/image_view_2"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="@null"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:layout_constraintWidth_percent="0.4"
+                    app:layout_constraintWidth_percent="0.25"
                     app:layout_constraintBottom_toBottomOf="@id/pie_chart_1"
                     app:layout_constraintEnd_toEndOf="@id/pie_chart_1"
                     app:layout_constraintStart_toStartOf="@id/pie_chart_1"
                     app:layout_constraintTop_toTopOf="@id/pie_chart_1"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#80000000"
-                    android:clickable="true" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -192,8 +192,10 @@
                     android:layout_height="0dp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
+                    android:text="@string/init_language"
+                    android:autoSizeTextType="uniform"
                     app:layout_constraintVertical_bias="0"
-                    app:layout_constraintHeight_percent="0.15"
+                    app:layout_constraintHeight_percent="0.20"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/view1"
@@ -212,6 +214,7 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view_1"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"

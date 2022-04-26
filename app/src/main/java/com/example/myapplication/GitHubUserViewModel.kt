@@ -1,10 +1,7 @@
 package com.example.myapplication
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -23,19 +20,22 @@ class GitHubUserViewModel(
     private var _avatar: String? = null
     val avatar: String?
         get() = _avatar
+    val detailUserList: MutableLiveData<ArrayList<DetailUser>>? by lazy {
+        MutableLiveData<ArrayList<DetailUser>>()
+    }
 
-    fun setLogin(login: String){
+
+    fun setLogin(login: String?){
         _login = login
     }
 
-    fun setHtml(html: String){
+    fun setHtml(html: String?){
         _html = html
     }
 
-    fun setAvatar(avatar: String){
+    fun setAvatar(avatar: String?){
         _avatar = avatar
     }
-
 
     fun searchGitHubUser(query: Int): Flow<PagingData<GitHubUser>>{
         pagingDataFlow = repository.getSearchResultStream(query).cachedIn(viewModelScope)
