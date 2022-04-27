@@ -1,5 +1,7 @@
-package com.example.myapplication
+package com.example.myapplication.api
 
+import com.example.myapplication.data.GitHubUserResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
@@ -10,5 +12,5 @@ interface GitHubUserAPI {
     suspend fun getGitHubUserData(
         @Query("since") since : Int,
         @Query("per_page") perPage : Int
-    ): Array<GitHubUserResponse>
+    ): Response<Array<GitHubUserResponse>>
 }

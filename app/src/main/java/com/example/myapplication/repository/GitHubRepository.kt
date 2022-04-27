@@ -1,9 +1,13 @@
-package com.example.myapplication
+package com.example.myapplication.repository
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.example.myapplication.remotemediator.GitHubRemoteMediator
+import com.example.myapplication.data.GitHubUser
+import com.example.myapplication.api.GitHubUserAPI
+import com.example.myapplication.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
 
 class GitHubRepository(

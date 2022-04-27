@@ -33,21 +33,22 @@
         android:textStyle="bold"
         app:layout_constraintVertical_bias="0"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintDimensionRatio="6:1"
+        app:layout_constraintDimensionRatio="8:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/guideline_percent_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <!--https://icons8.com/icon/73-->
+    <!--http://www.onlinewebfonts.com-->
     <ImageView
         android:id="@+id/image_view_1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@mipmap/icons8_homepage"
+        android:src="@drawable/homepage"
         android:foreground="?android:selectableItemBackground"
         android:clickable="true"
-        app:layout_constraintHorizontal_bias="0"
+        android:gravity="center"
+        app:layout_constraintWidth_percent="0.08"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="@id/guideline_percent_1"
         app:layout_constraintEnd_toEndOf="@id/guideline_percent_2"
@@ -67,7 +68,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/text_view_4"
+        android:id="@+id/text_view_3"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:autoSizeTextType="uniform"
@@ -80,17 +81,6 @@
         app:layout_constraintStart_toStartOf="@id/guideline_percent_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/text_view_1"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/text_view_3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintDimensionRatio="5:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView

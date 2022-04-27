@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.objects
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

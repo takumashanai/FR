@@ -1,7 +1,8 @@
-package com.example.myapplication
+package com.example.myapplication.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.example.myapplication.data.GitHubUser
 
 @Dao
 interface GitHubDao {
@@ -15,5 +16,5 @@ interface GitHubDao {
     suspend fun clearAll(): Int
 
     @Query("SELECT * FROM github_user_table")
-    fun getPagingSource(): PagingSource<Int,GitHubUser>
+    fun getPagingSource(): PagingSource<Int, GitHubUser>
 }

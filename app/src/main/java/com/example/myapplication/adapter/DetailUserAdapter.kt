@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.adapter
 
 import android.content.Intent
 import android.graphics.Outline
@@ -11,20 +11,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.data.DetailUser
+import com.example.myapplication.R
 import com.example.myapplication.databinding.ItemDetailBinding
 
 class DetailUserAdapter(
     diffCallback: DiffUtil.ItemCallback<DetailUser>
-    ): ListAdapter<DetailUser,DetailUserAdapter.DetailUserViewHolder>(diffCallback) {
+    ): ListAdapter<DetailUser, DetailUserAdapter.DetailUserViewHolder>(diffCallback) {
 
     class DetailUserViewHolder(
-        private val binding: ItemDetailBinding
+        binding: ItemDetailBinding
     ): RecyclerView.ViewHolder(binding.root) {
         private val activity = binding.root.context as AppCompatActivity
         private val text1 = binding.textView1
         private val text2 = binding.textView2
         private val text3 = binding.textView3
-        private val text4 = binding.textView4
         private val image1 = binding.imageView1
         fun bind(item: DetailUser){
             item.title?.let{ it ->
@@ -40,9 +41,6 @@ class DetailUserAdapter(
                 val description = text2.context.getString(R.string.description,it)
                 text2.text = description
             }
-            item.star?.let{
-                text3.text = it.toString()
-            }
             item.homepage?.let { url ->
                 image1.setOnClickListener{
                     openUrl(url)
@@ -50,23 +48,27 @@ class DetailUserAdapter(
             }
             image1.outlineProvider = object : ViewOutlineProvider() {
                 override fun getOutline(view: View, outline: Outline) {
-                    outline.setRoundRect(0, 0, view.width, view.height, 10f)
+                    outline.setOval(0, 0, view.width, view.height)
+                    view.clipToOutline = true
                 }
             }
             image1.clipToOutline = true
             item.star?.let{
-                text4.text = it.toString()
+                text3.text = it.toString()
             }
         }
 
-        private fun openUrl(url: String){
-            var webpage = Uri.parse(url)
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                webpage = Uri.parse("http://$url");
+        private fun openUrl(url: String?){
+            if(!url.isNullOrBlank()) {
+                var webpage = Uri.parse(url)
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    webpage = Uri.parse("http://$url")
+                }
+
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = webpage
+                activity.startActivity(intent)
             }
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = webpage
-            activity.startActivity(intent)
         }
     }
 

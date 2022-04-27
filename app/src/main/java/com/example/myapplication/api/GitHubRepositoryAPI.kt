@@ -1,5 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.api
 
+import com.example.myapplication.data.GitHubRepositoryResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Headers

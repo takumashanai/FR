@@ -1,25 +1,26 @@
-package com.example.myapplication
+package com.example.myapplication.fragment
 
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.myapplication.*
+import com.example.myapplication.adapter.DetailUserAdapter
+import com.example.myapplication.api.GitHubRepositoryAPI
+import com.example.myapplication.data.DetailUser
+import com.example.myapplication.data.GitHubRepositoryResponse
 import com.example.myapplication.databinding.FragmentDetailBinding
+import com.example.myapplication.objects.RetrofitInstance
+import com.example.myapplication.viewmodel.GitHubUserViewModel
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -33,7 +34,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class DetailFragment(): Fragment() {
+class DetailFragment: Fragment() {
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
     private val sharedViewModel: GitHubUserViewModel by activityViewModels()
@@ -50,18 +51,18 @@ class DetailFragment(): Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
     override fun onViewCreated(view:View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
-        val closeButton = binding.imageView1
-        closeButton.setOnClickListener{
+        val image1 = binding.imageView1
+        val text1 = binding.textView1
+        val pieChart = binding.pieChart1
+        val image2 = binding.imageView2
+        val text3 = binding.textView3
+        val view1 = binding.view1
+        image1.setOnClickListener{
             parentFragmentManager.beginTransaction().remove(this).commit()
         }
         sharedViewModel.login.let {
-            val text1 = binding.textView1
             text1.text = it
             if (it != null) {
                 repositoryAPI.getGitHubRepositoryData(it,"updated","desc",100,1)
@@ -81,7 +82,7 @@ class DetailFragment(): Fragment() {
                                     response.body()!!.forEach { body ->
                                         repositoryLanguageList.add(body.language)
                                     }
-                                    val repositoryLanguageMap: Map<String, Int> = repositoryLanguageList.groupingBy { it }.eachCount()
+                                    val repositoryLanguageMap: Map<String, Int> = repositoryLanguageList.groupingBy { item -> item }.eachCount()
                                     val dimensions = repositoryLanguageMap.keys.toList()
                                     val values = repositoryLanguageMap.values.map { num -> num.toFloat() }.toList()
                                     val entryList = mutableListOf<PieEntry>()
@@ -94,7 +95,8 @@ class DetailFragment(): Fragment() {
                                     pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
 
                                     val pieData = PieData(pieDataSet)
-                                    val pieChart = binding.pieChart1
+                                    pieData.setValueFormatter(MyValueFormatter())
+                                    pieData.setValueTextSize(12f)
                                     pieChart.data = pieData
                                     pieChart.animateY(1000, Easing.EaseInOutCubic)
                                     pieChart.description = null
@@ -107,24 +109,26 @@ class DetailFragment(): Fragment() {
                                         override fun onNothingSelected() { }
 
                                         override fun onValueSelected(e: Entry?, h: Highlight?) {
-                                            val text3 = binding.textView3
                                             val language = entryList[h?.x?.toInt()!!].label
-                                            text3.text = if(language == null) text3.context.getString(R.string.language,"None stated") else text3.context.getString(R.string.language,language)
+                                            text3.text = if(language == null) text3.context.getString(
+                                                R.string.language,"None stated") else text3.context.getString(
+                                                R.string.language,language)
                                             val detailUserList: ArrayList<DetailUser> = arrayListOf()
-                                            response.body()!!.forEach { it ->
-                                                if(it.language == language) {
-                                                    detailUserList.add(DetailUser(
-                                                        id = it.id,
-                                                        title = it.title,
-                                                        html = it.html,
-                                                        homepage = it.homepage,
-                                                        description = it.description,
-                                                        star = it.star
-                                                    ))
+                                            response.body()!!.forEach { item ->
+                                                if(item.language == language) {
+                                                    detailUserList.add(
+                                                        DetailUser(
+                                                        id = item.id,
+                                                        title = item.title,
+                                                        html = item.html,
+                                                        homepage = item.homepage,
+                                                        description = item.description,
+                                                        star = item.star
+                                                    )
+                                                    )
                                                 }
                                             }
                                             val colorInfo = ColorTemplate.COLORFUL_COLORS.toList()[h.x.toInt()%5]
-                                            val view1 = binding.view1
                                             text3.setTextColor(colorInfo)
                                             view1.setBackgroundColor(colorInfo)
                                             sharedViewModel.detailUserList?.value = detailUserList
@@ -132,7 +136,6 @@ class DetailFragment(): Fragment() {
                                     })
 
                                     sharedViewModel.avatar.let{ url ->
-                                        val image2 = binding.imageView2
                                         Glide.with(image2.context)
                                             .load(url)
                                             .circleCrop()
@@ -154,13 +157,13 @@ class DetailFragment(): Fragment() {
         itemDecoration.setDrawable(ColorDrawable(resources.getColor(R.color.black,null)))
         recyclerView.addItemDecoration(itemDecoration)
 
-        sharedViewModel.detailUserList?.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.detailUserList?.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
         sharedViewModel.html.let{
             val text2 = binding.textView2
-            val url = it
+            val url = text2.context.getString(R.string.link,it)
             text2.text = url
             text2.setOnClickListener {
                 openUrl(url)
@@ -170,22 +173,22 @@ class DetailFragment(): Fragment() {
 
     override fun onDestroyView(){
         super.onDestroyView()
-        _binding = null
         sharedViewModel.detailUserList?.value = null
         sharedViewModel.setLogin(null)
         sharedViewModel.setAvatar(null)
         sharedViewModel.setHtml(null)
+        _binding = null
     }
 
     private fun openUrl(url: String?){
-        var webpage = Uri.parse(url)
-        if (url != null) {
+        if(!url.isNullOrBlank()) {
+            var webpage = Uri.parse(url)
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                webpage = Uri.parse("http://$url");
+                webpage = Uri.parse("http://$url")
             }
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = webpage
+            activity?.startActivity(intent)
         }
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = webpage
-        activity?.startActivity(intent)
     }
 }

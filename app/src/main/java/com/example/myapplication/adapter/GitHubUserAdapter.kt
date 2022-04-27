@@ -1,21 +1,20 @@
-package com.example.myapplication
+package com.example.myapplication.adapter
 
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Fade
+import androidx.transition.TransitionSet
 import com.bumptech.glide.Glide
+import com.example.myapplication.fragment.DetailFragment
+import com.example.myapplication.data.GitHubUser
+import com.example.myapplication.R
 import com.example.myapplication.databinding.ItemMainBinding
-import com.example.myapplication.RetrofitInstance.retrofit
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class GitHubUserAdapter(
     diffCallback: DiffUtil.ItemCallback<GitHubUser>,
@@ -38,8 +37,7 @@ class GitHubUserAdapter(
 
         fun bind(item: GitHubUser?){
             item?.login?.let{
-                val name = text1.context.getString(R.string.name,it)
-                text1.text = name
+                text1.text = it
             }
             item?.avatar?.let{
                 Glide.with(image.context)
@@ -48,8 +46,7 @@ class GitHubUserAdapter(
                     .into(image)
             }
             item?.html?.let { it ->
-                val url = text2.context.getString(R.string.link,it)
-                text2.text = url
+                text2.text = it
                 text2.setOnClickListener { v ->
                     openUrl(it)
                 }
@@ -57,6 +54,10 @@ class GitHubUserAdapter(
             card.setOnClickListener{
                 itemClickListener.onItemClick(item?.login,item?.html,item?.avatar)
                 val detailFragment = DetailFragment()
+                val transitionSet = TransitionSet()
+                transitionSet.addTransition(Fade())
+                detailFragment.enterTransition = transitionSet
+                detailFragment.exitTransition = transitionSet
                 val transaction = activity.supportFragmentManager.beginTransaction()
                 transaction
                     .replace(R.id.container_main_activity,detailFragment)
@@ -65,14 +66,16 @@ class GitHubUserAdapter(
             }
         }
 
-        private fun openUrl(url: String){
-            var webpage = Uri.parse(url)
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                webpage = Uri.parse("http://$url");
+        private fun openUrl(url: String?){
+            if(!url.isNullOrBlank()) {
+                var webpage = Uri.parse(url)
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    webpage = Uri.parse("http://$url")
+                }
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = webpage
+                activity.startActivity(intent)
             }
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = webpage
-            activity.startActivity(intent)
         }
     }
 

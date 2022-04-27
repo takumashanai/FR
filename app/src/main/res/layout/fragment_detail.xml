@@ -2,12 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <View
-        android:id="@+id/view2"
+        android:id="@+id/view_2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
@@ -19,7 +18,7 @@
         android:layout_height="0dp"
         app:cardCornerRadius="15dp"
         android:elevation="2dp"
-        app:cardBackgroundColor="@color/white"
+        app:cardBackgroundColor="@color/main_bg"
         app:layout_constraintHeight_percent="0.8"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -61,7 +60,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.95"/>
+                app:layout_constraintGuide_percent="0.98"/>
 
             <!--login top-->
             <androidx.constraintlayout.widget.Guideline
@@ -135,11 +134,11 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:autoSizeTextType="uniform"
-                android:text="@string/link"
+                android:text="@string/init_link"
                 android:textColor="#0000ff"
                 android:textStyle="bold"
                 android:maxLines="1"
-                android:gravity="start"
+                android:gravity="center_vertical|start"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintBottom_toBottomOf="@id/guideline_percent_106"
                 app:layout_constraintEnd_toEndOf="@id/guideline_percent_2"
@@ -198,11 +197,11 @@
                     app:layout_constraintHeight_percent="0.20"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/view1"
+                    app:layout_constraintStart_toEndOf="@id/view_1"
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <View
-                    android:id="@+id/view1"
+                    android:id="@+id/view_1"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:background="@color/black"
@@ -219,7 +218,7 @@
                     android:layout_height="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/view1"
+                    app:layout_constraintStart_toEndOf="@id/view_1"
                     app:layout_constraintTop_toBottomOf="@id/text_view_3"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -234,6 +233,7 @@
         android:layout_height="60dp"
         android:src="@drawable/close"
         android:elevation="2dp"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toTopOf="@id/card_view_1"
         app:layout_constraintEnd_toEndOf="@id/card_view_1"
         app:layout_constraintStart_toEndOf="@id/card_view_1"

@@ -1,23 +1,22 @@
-package com.example.myapplication
+package com.example.myapplication.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.myapplication.data.GitHubUser
+import com.example.myapplication.adapter.GitHubLoadStateAdapter
+import com.example.myapplication.adapter.GitHubUserAdapter
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.viewmodel.GitHubUserViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
@@ -34,22 +33,6 @@ class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
         )
     }
 
-    override fun onStart() {
-        super.onStart()
-        /*binding.button1.setOnClickListener{
-            binding.editText1.text?.let {
-                pagingData = viewModel.searchGitHubUser(it.toString().toInt())
-                binding.bindState(
-                    pagingData = pagingData
-                )
-            }
-        }*/
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
     private fun ActivityMainBinding.bindState(
         pagingData: Flow<PagingData<GitHubUser>>
     ){
@@ -62,8 +45,8 @@ class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
         swipe1.setOnRefreshListener {
             adapter.refresh()
         }
-        recyclerView1.layoutManager = LinearLayoutManager(
-            this@MainActivity,LinearLayoutManager.VERTICAL,false
+        recyclerView1.layoutManager = GridLayoutManager(
+            this@MainActivity,2,GridLayoutManager.VERTICAL,false
         )
         bindList(
             userLoadState = loadState,
@@ -93,7 +76,7 @@ class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
                 recyclerView1.isVisible =  loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
                 progressBar1.isVisible = loadState.mediator?.refresh is LoadState.Loading
                 button1.isVisible = loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
-                swipe1.isRefreshing = loadState.mediator?.refresh !is LoadState.NotLoading
+                swipe1.isRefreshing = loadState.source.refresh is LoadState.Loading || loadState.mediator?.refresh is LoadState.Loading
                 val errorState = loadState.source.append as? LoadState.Error
                     ?: loadState.source.prepend as? LoadState.Error
                     ?: loadState.append as? LoadState.Error
@@ -109,15 +92,15 @@ class MainActivity : AppCompatActivity(), GitHubUserAdapter.ItemClickListener {
         }
     }
 
-    override fun onItemClick(login: String?,html: String?,avater: String?) {
+    override fun onItemClick(login: String?, html: String?, avatar: String?) {
         if (login != null) {
             viewModel.setLogin(login)
         }
         if (html != null) {
             viewModel.setHtml(html)
         }
-        if (avater != null) {
-            viewModel.setAvatar(avater)
+        if (avatar != null) {
+            viewModel.setAvatar(avatar)
         }
     }
 }
