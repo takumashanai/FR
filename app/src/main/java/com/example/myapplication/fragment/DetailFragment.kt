@@ -165,8 +165,8 @@ class DetailFragment: Fragment() {
             val text2 = binding.textView2
             val url = text2.context.getString(R.string.link,it)
             text2.text = url
-            text2.setOnClickListener {
-                openUrl(url)
+            text2.setOnClickListener { v ->
+                openUrl(it)
             }
         }
     }

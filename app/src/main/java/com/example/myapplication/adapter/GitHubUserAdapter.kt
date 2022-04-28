@@ -60,7 +60,7 @@ class GitHubUserAdapter(
                 detailFragment.exitTransition = transitionSet
                 val transaction = activity.supportFragmentManager.beginTransaction()
                 transaction
-                    .replace(R.id.container_main_activity,detailFragment)
+                    .add(R.id.container_main_activity,detailFragment)
                     .addToBackStack(null)
                     .commit()
             }
