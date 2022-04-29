@@ -8,18 +8,20 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.NavHostFragment
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.myapplication.R
 import com.example.myapplication.adapter.GitHubLoadStateAdapter
 import com.example.myapplication.adapter.GitHubUserAdapter
 import com.example.myapplication.data.GitHubUser
 import com.example.myapplication.databinding.FragmentMainBinding
 import com.example.myapplication.viewmodel.GitHubUserViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
@@ -74,46 +76,56 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
     ) {
         button1.setOnClickListener { adapter.retry() }
         lifecycleScope.launch {
-            pagingData.collectLatest(adapter::submitData)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                pagingData.collectLatest(adapter::submitData)
+            }
         }
 
         lifecycleScope.launch {
-            adapter.loadStateFlow.collect { loadState ->
-                userLoadState.loadState = loadState.mediator
-                    ?.refresh
-                    ?.takeIf { it is LoadState.Error && adapter.itemCount > 0 }
-                    ?: loadState.prepend
-                val isListEmpty =
-                    loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
-                textView1.isVisible = isListEmpty
-                recyclerView1.isVisible =
-                    loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
-                progressBar1.isVisible = loadState.mediator?.refresh is LoadState.Loading
-                button1.isVisible =
-                    loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
-                swipe1.isRefreshing =
-                    loadState.source.refresh is LoadState.Loading || loadState.mediator?.refresh is LoadState.Loading
-                val errorState = loadState.source.append as? LoadState.Error
-                    ?: loadState.source.prepend as? LoadState.Error
-                    ?: loadState.append as? LoadState.Error
-                    ?: loadState.prepend as? LoadState.Error
-                errorState?.let {
-                    Toast.makeText(
-                        activity,
-                        "${it.error}",
-                        Toast.LENGTH_LONG
-                    ).show()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow.collect { loadState ->
+                    userLoadState.loadState = loadState.mediator
+                        ?.refresh
+                        ?.takeIf { it is LoadState.Error && adapter.itemCount > 0 }
+                        ?: loadState.prepend
+                    val isListEmpty =
+                        loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
+                    textView1.isVisible = isListEmpty
+                    recyclerView1.isVisible =
+                        loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
+                    progressBar1.isVisible = loadState.mediator?.refresh is LoadState.Loading
+                    button1.isVisible =
+                        loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
+                    swipe1.isRefreshing =
+                        loadState.source.refresh is LoadState.Loading || loadState.mediator?.refresh is LoadState.Loading
+                    val errorState = loadState.refresh as? LoadState.Error
+                        ?: loadState.source.append as? LoadState.Error
+                        ?: loadState.source.prepend as? LoadState.Error
+                        ?: loadState.append as? LoadState.Error
+                        ?: loadState.prepend as? LoadState.Error
+                    errorState?.let {
+                        Toast.makeText(
+                            activity,
+                            "${it.error}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow
+                    .distinctUntilChangedBy { it.refresh }
+                    .filter { it.refresh is LoadState.NotLoading }
+                    .collect { recyclerView1.scrollToPosition(0) }
             }
         }
     }
 
     override fun onDestroyView(){
         super.onDestroyView()
-        sharedViewModel.detailUserList?.value = null
-        sharedViewModel.setLogin(null)
-        sharedViewModel.setAvatar(null)
-        sharedViewModel.setHtml(null)
         _binding = null
     }
 
@@ -127,6 +139,12 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
         if (avatar != null) {
             sharedViewModel.setAvatar(avatar)
         }
+        sharedViewModel.detailUserList?.value = null
+        val navHostFragment =
+            requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        val action = MainFragmentDirections.actionMainFragmentToDetailFragment()
+        navController.navigate(action)
     }
 }
 private const val DEFAULT_QUERY = 1

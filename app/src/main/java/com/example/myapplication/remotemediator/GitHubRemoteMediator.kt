@@ -11,20 +11,25 @@ import com.example.myapplication.api.GitHubUserAPI
 import com.example.myapplication.db.AppDatabase
 import retrofit2.HttpException
 import java.io.IOException
+import kotlin.math.sin
 
 
 @ExperimentalPagingApi
 class GitHubRemoteMediator(
     private val networkService: GitHubUserAPI,
     private val database: AppDatabase,
-    private var since: Int
+    private val since: Int
 ) : RemoteMediator<Int, GitHubUser>() {
+    private var middleLoadKey: Int = 0
     override suspend fun load(
         loadType: LoadType, state: PagingState<Int, GitHubUser>
     ): MediatorResult {
         return try {
             val loadKey = when (loadType) {
-                LoadType.REFRESH -> since
+                LoadType.REFRESH -> {
+                    middleLoadKey = since
+                    since
+                }
                 LoadType.PREPEND ->
                     return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
@@ -32,13 +37,13 @@ class GitHubRemoteMediator(
                         ?: return MediatorResult.Success(
                             endOfPaginationReached = true
                         )
-                    since += 100
-                    since
+                    middleLoadKey += PER_PAGE
+                    middleLoadKey
                 }
             }
 
             val response = networkService.getGitHubUserData(
-                since = loadKey, perPage = 100
+                since = loadKey, perPage = PER_PAGE
             )
             val endOfPaginationReached = response.body().isNullOrEmpty()
 
@@ -50,16 +55,20 @@ class GitHubRemoteMediator(
                     if (loadType == LoadType.REFRESH) {
                         database.gitHubDao().clearAll()
                     }
-                    response.body()?.forEach {
-                        database.gitHubDao().insert(
-                            GitHubUser(
-                                id = it.id,
-                                login = it.login,
-                                avatar = it.avatar,
-                                html = it.html,
-                                repos = it.repos
+                    response.body()?.let {
+                        val userList: ArrayList<GitHubUser> = arrayListOf()
+                        it.forEach { item ->
+                            userList.add(
+                                GitHubUser(
+                                    id = item.id,
+                                    login = item.login,
+                                    avatar = item.avatar,
+                                    html = item.html,
+                                    repos = item.repos
+                                )
                             )
-                        )
+                        }
+                        if(!userList.isNullOrEmpty()) database.gitHubDao().insertAll(userList)
                     }
                 }
 
@@ -76,3 +85,4 @@ class GitHubRemoteMediator(
         }
     }
 }
+private const val PER_PAGE = 100

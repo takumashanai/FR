@@ -37,8 +37,11 @@ class DetailUserAdapter(
                     }
                 }
             }
-            item.description?.let{
-                val description = text2.context.getString(R.string.description,it)
+            if(item.description!=null){
+                val description = text2.context.getString(R.string.description,item.description)
+                text2.text = description
+            }else{
+                val description = text2.context.getString(R.string.description,"None stated")
                 text2.text = description
             }
             item.homepage?.let { url ->

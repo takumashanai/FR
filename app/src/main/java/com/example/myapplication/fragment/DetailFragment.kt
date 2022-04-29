@@ -53,15 +53,11 @@ class DetailFragment: Fragment() {
 
     override fun onViewCreated(view:View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
-        val image1 = binding.imageView1
         val text1 = binding.textView1
         val pieChart = binding.pieChart1
         val image2 = binding.imageView2
         val text3 = binding.textView3
         val view1 = binding.view1
-        image1.setOnClickListener{
-            parentFragmentManager.beginTransaction().remove(this).commit()
-        }
         sharedViewModel.login.let {
             text1.text = it
             if (it != null) {
@@ -76,7 +72,7 @@ class DetailFragment: Fragment() {
                         }
 
                         override fun onResponse(call: Call<Array<GitHubRepositoryResponse>>?, response: Response<Array<GitHubRepositoryResponse>>) {
-                            if (response.isSuccessful) {
+                            if (response.isSuccessful && response.code() == 200) {
                                 response.body()?.let {
                                     val repositoryLanguageList: ArrayList<String> = arrayListOf()
                                     response.body()!!.forEach { body ->
@@ -142,6 +138,8 @@ class DetailFragment: Fragment() {
                                             .into(image2)
                                     }
                                 }
+                            } else {
+
                             }
                         }
                     })
@@ -173,10 +171,10 @@ class DetailFragment: Fragment() {
 
     override fun onDestroyView(){
         super.onDestroyView()
-        sharedViewModel.detailUserList?.value = null
+        /*sharedViewModel.detailUserList?.value = null
         sharedViewModel.setLogin(null)
         sharedViewModel.setAvatar(null)
-        sharedViewModel.setHtml(null)
+        sharedViewModel.setHtml(null)*/
         _binding = null
     }
 

@@ -3,6 +3,7 @@
     <string name="retry">retry</string>
     <string name="no_results">No results</string>
     <string name="init_link">URL: </string>
+    <string name="init_description">Desc:</string>
     <string name="description">Desc: %1$s</string>
     <string name="language">Language: %1$s</string>
     <string name="item">・ %1$s</string>

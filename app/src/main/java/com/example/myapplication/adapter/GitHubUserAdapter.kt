@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +16,7 @@ import com.example.myapplication.fragment.DetailFragment
 import com.example.myapplication.data.GitHubUser
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ItemMainBinding
+import com.example.myapplication.fragment.MainFragmentDirections
 
 class GitHubUserAdapter(
     diffCallback: DiffUtil.ItemCallback<GitHubUser>,
@@ -53,16 +55,6 @@ class GitHubUserAdapter(
             }
             card.setOnClickListener{
                 itemClickListener.onItemClick(item?.login,item?.html,item?.avatar)
-                val detailFragment = DetailFragment()
-                val transitionSet = TransitionSet()
-                transitionSet.addTransition(Fade())
-                detailFragment.enterTransition = transitionSet
-                detailFragment.exitTransition = transitionSet
-                val transaction = activity.supportFragmentManager.beginTransaction()
-                transaction
-                    .add(R.id.container_main_activity,detailFragment)
-                    .addToBackStack(null)
-                    .commit()
             }
         }
 
