@@ -11,7 +11,6 @@ import com.example.myapplication.api.GitHubUserAPI
 import com.example.myapplication.db.AppDatabase
 import retrofit2.HttpException
 import java.io.IOException
-import kotlin.math.sin
 
 
 @ExperimentalPagingApi

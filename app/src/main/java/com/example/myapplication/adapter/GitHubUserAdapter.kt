@@ -48,7 +48,6 @@ class GitHubUserAdapter(
                     .into(image)
             }
             item?.html?.let { it ->
-                text2.text = it
                 text2.setOnClickListener { v ->
                     openUrl(it)
                 }
@@ -58,8 +57,8 @@ class GitHubUserAdapter(
             }
         }
 
-        private fun openUrl(url: String?){
-            if(!url.isNullOrBlank()) {
+        private fun openUrl(url: String){
+            if(url.isNotBlank()) {
                 var webpage = Uri.parse(url)
                 if (!url.startsWith("http://") && !url.startsWith("https://")) {
                     webpage = Uri.parse("http://$url")

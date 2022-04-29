@@ -58,92 +58,101 @@ class DetailFragment: Fragment() {
         val image2 = binding.imageView2
         val text3 = binding.textView3
         val view1 = binding.view1
-        sharedViewModel.login.let {
+        sharedViewModel.login?.let {
             text1.text = it
-            if (it != null) {
-                repositoryAPI.getGitHubRepositoryData(it,"updated","desc",100,1)
-                    .enqueue(object : Callback<Array<GitHubRepositoryResponse>> {
-                        override fun onFailure(call: Call<Array<GitHubRepositoryResponse>>?, t: Throwable?) {
-                            Toast.makeText(
-                                activity,
-                                "load error",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+            repositoryAPI.getGitHubRepositoryData(it,"updated","desc",100,1)
+                .enqueue(object : Callback<Array<GitHubRepositoryResponse>> {
+                    override fun onFailure(call: Call<Array<GitHubRepositoryResponse>>?, t: Throwable?) {
+                        Toast.makeText(
+                            activity,
+                            "load error",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
 
-                        override fun onResponse(call: Call<Array<GitHubRepositoryResponse>>?, response: Response<Array<GitHubRepositoryResponse>>) {
-                            if (response.isSuccessful && response.code() == 200) {
-                                response.body()?.let {
-                                    val repositoryLanguageList: ArrayList<String> = arrayListOf()
-                                    response.body()!!.forEach { body ->
-                                        repositoryLanguageList.add(body.language)
-                                    }
-                                    val repositoryLanguageMap: Map<String, Int> = repositoryLanguageList.groupingBy { item -> item }.eachCount()
-                                    val dimensions = repositoryLanguageMap.keys.toList()
-                                    val values = repositoryLanguageMap.values.map { num -> num.toFloat() }.toList()
-                                    val entryList = mutableListOf<PieEntry>()
-                                    for(i in values.indices){
-                                        entryList.add(
-                                            PieEntry(values[i], dimensions[i])
-                                        )
-                                    }
-                                    val pieDataSet = PieDataSet(entryList, "candle")
-                                    pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+                    override fun onResponse(call: Call<Array<GitHubRepositoryResponse>>?, response: Response<Array<GitHubRepositoryResponse>>) {
+                        if (response.isSuccessful && response.code() == 200) {
+                            response.body()?.let {
+                                val repositoryLanguageList: ArrayList<String> = arrayListOf()
+                                response.body()!!.forEach { body ->
+                                    repositoryLanguageList.add(body.language)
+                                }
+                                val repositoryLanguageMap: Map<String, Int> = repositoryLanguageList.groupingBy { item -> item }.eachCount()
+                                val dimensions = repositoryLanguageMap.keys.toList()
+                                val values = repositoryLanguageMap.values.map { num -> num.toFloat() }.toList()
+                                val entryList = mutableListOf<PieEntry>()
+                                for(i in values.indices){
+                                    entryList.add(
+                                        PieEntry(values[i], dimensions[i])
+                                    )
+                                }
+                                val pieDataSet = PieDataSet(entryList, "candle")
+                                pieDataSet.valueLinePart1OffsetPercentage = .90f
+                                pieDataSet.valueLinePart1Length = .50f
+                                pieDataSet.valueLinePart2Length = .50f
+                                pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
 
-                                    val pieData = PieData(pieDataSet)
-                                    pieData.setValueFormatter(MyValueFormatter())
-                                    pieData.setValueTextSize(12f)
-                                    pieChart.data = pieData
-                                    pieChart.animateY(1000, Easing.EaseInOutCubic)
-                                    pieChart.description = null
-                                    pieChart.legend.isEnabled = false
-                                    pieChart.isClickable = true
-                                    pieChart.invalidate()
+                                val pieData = PieData(pieDataSet)
+                                pieData.setValueFormatter(MyValueFormatter())
+                                pieData.setValueTextSize(16f)
+                                pieChart.data = pieData
+                                pieChart.setEntryLabelTextSize(16f)
+                                pieChart.setEntryLabelColor(resources.getColor(R.color.black,null))
+                                pieChart.animateY(1000, Easing.EaseInOutCubic)
+                                pieChart.description = null
+                                pieChart.legend.isEnabled = false
+                                pieChart.isClickable = true
+                                pieChart.invalidate()
 
-                                    pieChart.setOnChartValueSelectedListener(object :
-                                        OnChartValueSelectedListener {
-                                        override fun onNothingSelected() { }
+                                pieChart.setOnChartValueSelectedListener(object :
+                                    OnChartValueSelectedListener {
+                                    override fun onNothingSelected() { }
 
-                                        override fun onValueSelected(e: Entry?, h: Highlight?) {
-                                            val language = entryList[h?.x?.toInt()!!].label
+                                    override fun onValueSelected(e: Entry?, h: Highlight?) {
+                                        h?.let { high ->
+                                            val language = entryList[high.x.toInt()].label
                                             text3.text = if(language == null) text3.context.getString(
                                                 R.string.language,"None stated") else text3.context.getString(
                                                 R.string.language,language)
                                             val detailUserList: ArrayList<DetailUser> = arrayListOf()
                                             response.body()!!.forEach { item ->
                                                 if(item.language == language) {
-                                                    detailUserList.add(
-                                                        DetailUser(
+                                                    detailUserList.add(DetailUser(
                                                         id = item.id,
                                                         title = item.title,
                                                         html = item.html,
                                                         homepage = item.homepage,
                                                         description = item.description,
                                                         star = item.star
-                                                    )
-                                                    )
+                                                    ))
                                                 }
                                             }
-                                            val colorInfo = ColorTemplate.COLORFUL_COLORS.toList()[h.x.toInt()%5]
+                                            val colorInfo =
+                                                ColorTemplate.COLORFUL_COLORS.toList()[high.x.toInt() % 5]
                                             text3.setTextColor(colorInfo)
                                             view1.setBackgroundColor(colorInfo)
                                             sharedViewModel.detailUserList?.value = detailUserList
                                         }
-                                    })
 
-                                    sharedViewModel.avatar.let{ url ->
-                                        Glide.with(image2.context)
-                                            .load(url)
-                                            .circleCrop()
-                                            .into(image2)
                                     }
-                                }
-                            } else {
+                                })
 
+                                sharedViewModel.avatar?.let{ url ->
+                                    Glide.with(image2.context)
+                                        .load(url)
+                                        .circleCrop()
+                                        .into(image2)
+                                }
                             }
+                        } else {
+                            Toast.makeText(
+                                activity,
+                                "${response.code()} error",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
-                    })
-            }
+                    }
+                })
         }
 
         val adapter = DetailUserAdapter(DetailUserAdapter.UserComparator)
@@ -159,7 +168,7 @@ class DetailFragment: Fragment() {
             adapter.submitList(it)
         })
 
-        sharedViewModel.html.let{
+        sharedViewModel.html?.let{
             val text2 = binding.textView2
             val url = text2.context.getString(R.string.link,it)
             text2.text = url
@@ -171,15 +180,11 @@ class DetailFragment: Fragment() {
 
     override fun onDestroyView(){
         super.onDestroyView()
-        /*sharedViewModel.detailUserList?.value = null
-        sharedViewModel.setLogin(null)
-        sharedViewModel.setAvatar(null)
-        sharedViewModel.setHtml(null)*/
         _binding = null
     }
 
-    private fun openUrl(url: String?){
-        if(!url.isNullOrBlank()) {
+    private fun openUrl(url: String){
+        if(url.isNotBlank()) {
             var webpage = Uri.parse(url)
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
                 webpage = Uri.parse("http://$url")

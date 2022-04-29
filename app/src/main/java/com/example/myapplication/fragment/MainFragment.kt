@@ -130,15 +130,9 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
     }
 
     override fun onItemClick(login: String?, html: String?, avatar: String?) {
-        if (login != null) {
-            sharedViewModel.setLogin(login)
-        }
-        if (html != null) {
-            sharedViewModel.setHtml(html)
-        }
-        if (avatar != null) {
-            sharedViewModel.setAvatar(avatar)
-        }
+        sharedViewModel.setLogin(login)
+        sharedViewModel.setHtml(html)
+        sharedViewModel.setAvatar(avatar)
         sharedViewModel.detailUserList?.value = null
         val navHostFragment =
             requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment

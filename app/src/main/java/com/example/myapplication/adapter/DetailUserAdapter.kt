@@ -3,6 +3,7 @@ package com.example.myapplication.adapter
 import android.content.Intent
 import android.graphics.Outline
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,37 +38,36 @@ class DetailUserAdapter(
                     }
                 }
             }
-            if(item.description!=null){
-                val description = text2.context.getString(R.string.description,item.description)
+            item.description?.let {
+                val description = text2.context.getString(R.string.description,it)
                 text2.text = description
-            }else{
+            } ?: let {
                 val description = text2.context.getString(R.string.description,"None stated")
                 text2.text = description
             }
+
             item.homepage?.let { url ->
-                image1.setOnClickListener{
-                    openUrl(url)
+                if (url.isBlank()) image1.visibility = View.INVISIBLE else {
+                    image1.visibility = View.VISIBLE
+                    image1.clipToOutline = true
+                    image1.setOnClickListener{
+                        openUrl(url)
+                    }
                 }
+            } ?: let {
+                image1.visibility = View.INVISIBLE
             }
-            image1.outlineProvider = object : ViewOutlineProvider() {
-                override fun getOutline(view: View, outline: Outline) {
-                    outline.setOval(0, 0, view.width, view.height)
-                    view.clipToOutline = true
-                }
-            }
-            image1.clipToOutline = true
             item.star?.let{
-                text3.text = it.toString()
+                text3.text = "$it"
             }
         }
 
-        private fun openUrl(url: String?){
-            if(!url.isNullOrBlank()) {
+        private fun openUrl(url: String){
+            if(url.isNotBlank()) {
                 var webpage = Uri.parse(url)
                 if (!url.startsWith("http://") && !url.startsWith("https://")) {
                     webpage = Uri.parse("http://$url")
                 }
-
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.data = webpage
                 activity.startActivity(intent)

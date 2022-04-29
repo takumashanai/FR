@@ -16,26 +16,23 @@ class GitHubUserViewModel(
 ): AndroidViewModel(application) {
     private lateinit var pagingDataFlow: Flow<PagingData<GitHubUser>>
     private val repository: GitHubRepository = Injection.provideGitHubRepository(context = application)
-    //private var _login: String? = null
-    val login: String? get() = state.get("login")
-    //private var _html: String? = state.get("html")
-    val html: String? get() = state.get("html")
-    //private var _avatar: String? = null
-    val avatar: String? get() = state.get("avatar")
+    val login: String? get() = state.get("LOGIN")
+    val html: String? get() = state.get("HTML")
+    val avatar: String? get() = state.get("AVATAR")
     val detailUserList: MutableLiveData<ArrayList<DetailUser>>? by lazy {
         MutableLiveData<ArrayList<DetailUser>>()
     }
 
     fun setLogin(login: String?){
-        state["login"] = login
+        state["LOGIN"] = login
     }
 
     fun setHtml(html: String?){
-        state["html"] = html
+        state["HTML"] = html
     }
 
     fun setAvatar(avatar: String?){
-        state["avatar"] = avatar
+        state["AVATAR"] = avatar
     }
 
     fun searchGitHubUser(query: Int): Flow<PagingData<GitHubUser>>{
