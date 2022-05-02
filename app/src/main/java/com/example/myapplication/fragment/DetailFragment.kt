@@ -135,7 +135,7 @@ class DetailFragment: Fragment() {
 
                                 pieChart.setExtraOffsets(0f, 10f, 0f, 10f)
                                 pieChart.data = pieData
-                                pieChart.setEntryLabelColor(resources.getColor(R.color.black,null))
+                                pieChart.setEntryLabelColor(requireActivity().resources.getColor(R.color.black,null))
                                 pieChart.animateY(1000, Easing.EaseInOutCubic)
                                 pieChart.description.text = "100 latest repositories"
                                 pieChart.legend.isEnabled = false
@@ -194,9 +194,9 @@ class DetailFragment: Fragment() {
         }
         sharedViewModel.language.observe(viewLifecycleOwner){
             it?.let { language ->
-                text3.text = resources.getString(R.string.language, language)
+                text3.text = requireActivity().resources.getString(R.string.language, language)
             } ?: let{
-                text3.text = resources.getString(R.string.init_language)
+                text3.text = requireActivity().resources.getString(R.string.init_language)
             }
         }
 
@@ -220,7 +220,7 @@ class DetailFragment: Fragment() {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
         val itemDecoration = DividerItemDecoration(activity,layoutManager.orientation)
-        itemDecoration.setDrawable(ColorDrawable(resources.getColor(R.color.black,null)))
+        itemDecoration.setDrawable(ColorDrawable(requireActivity().resources.getColor(R.color.black,null)))
         recyclerView.addItemDecoration(itemDecoration)
 
         sharedViewModel.html?.let{
