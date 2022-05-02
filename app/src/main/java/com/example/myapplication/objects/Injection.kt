@@ -8,6 +8,6 @@ import com.example.myapplication.repository.GitHubRepository
 
 object Injection {
     fun provideGitHubRepository(context: Context): GitHubRepository {
-        return GitHubRepository(retrofit.create(GitHubUserAPI::class.java), AppDatabase.getDatabase(context))
+        return GitHubRepository(retrofit.create(GitHubUserAPI::class.java), AppDatabase.getDatabase(context),context)
     }
 }

@@ -10,15 +10,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.myapplication.*
 import com.example.myapplication.adapter.DetailUserAdapter
 import com.example.myapplication.api.GitHubRepositoryAPI
-import com.example.myapplication.data.DetailUser
 import com.example.myapplication.data.GitHubRepositoryResponse
+import com.example.myapplication.data.GitHubRepositoryUser
 import com.example.myapplication.databinding.FragmentDetailBinding
+import com.example.myapplication.db.AppDatabase
 import com.example.myapplication.objects.RetrofitInstance
 import com.example.myapplication.viewmodel.GitHubUserViewModel
 import com.github.mikephil.charting.animation.Easing
@@ -29,6 +33,8 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -55,12 +61,25 @@ class DetailFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val text1 = binding.textView1
         val pieChart = binding.pieChart1
+        val image1 = binding.imageView1
         val image2 = binding.imageView2
         val text3 = binding.textView3
+        val text2 = binding.textView2
+        val text4 = binding.textView4
         val view1 = binding.view1
-        sharedViewModel.login?.let {
-            text1.text = it
-            repositoryAPI.getGitHubRepositoryData(it,"updated","desc",100,1)
+        val database = activity?.let { AppDatabase.getDatabase(it) }
+        val dao = database?.gitHubRepositoryDao()
+
+        image2.clipToOutline = true
+        sharedViewModel.login?.let { login ->
+            text1.text = login
+            text2.setOnClickListener {
+                openUrl("https://github.com/${login}?tab=repositories")
+            }
+            text4.setOnClickListener {
+                openUrl("https://github.com/${login}?tab=followers")
+            }
+            repositoryAPI.getGitHubRepositoryData(context?.let { Signature.getAccessToken(it) },login,"updated","desc",100,1)
                 .enqueue(object : Callback<Array<GitHubRepositoryResponse>> {
                     override fun onFailure(call: Call<Array<GitHubRepositoryResponse>>?, t: Throwable?) {
                         Toast.makeText(
@@ -87,19 +106,38 @@ class DetailFragment: Fragment() {
                                     )
                                 }
                                 val pieDataSet = PieDataSet(entryList, "candle")
-                                pieDataSet.valueLinePart1OffsetPercentage = .90f
-                                pieDataSet.valueLinePart1Length = .50f
-                                pieDataSet.valueLinePart2Length = .50f
+                                pieDataSet.valueLinePart1OffsetPercentage = 100f
+                                pieDataSet.sliceSpace = 3f
                                 pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+                                pieDataSet.setValueTextColors(ColorTemplate.COLORFUL_COLORS.toList())
+                                pieDataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                                pieDataSet.xValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
+                                pieDataSet.valueTextSize = 16f
+                                pieDataSet.isUsingSliceColorAsValueLineColor = true
 
                                 val pieData = PieData(pieDataSet)
                                 pieData.setValueFormatter(MyValueFormatter())
-                                pieData.setValueTextSize(16f)
+                                values.minOrNull()?.let { min ->
+                                    val minAngle = (min / values.sum()) * 360
+                                    val minAngleForSlices = when{
+                                        minAngle < minOf(15f,((360 / entryList.size)/1.3).toFloat()) ->
+                                        {
+                                            pieChart.setEntryLabelTextSize(14f)
+                                            minOf(15f,((360 / entryList.size)/1.3).toFloat())
+                                        }
+                                        else -> {
+                                            pieChart.setEntryLabelTextSize(18f)
+                                            0f
+                                        }
+                                    }
+                                    pieChart.minAngleForSlices = minAngleForSlices
+                                }
+
+                                pieChart.setExtraOffsets(0f, 10f, 0f, 10f)
                                 pieChart.data = pieData
-                                pieChart.setEntryLabelTextSize(16f)
                                 pieChart.setEntryLabelColor(resources.getColor(R.color.black,null))
                                 pieChart.animateY(1000, Easing.EaseInOutCubic)
-                                pieChart.description = null
+                                pieChart.description.text = "100 latest repositories"
                                 pieChart.legend.isEnabled = false
                                 pieChart.isClickable = true
                                 pieChart.invalidate()
@@ -111,13 +149,11 @@ class DetailFragment: Fragment() {
                                     override fun onValueSelected(e: Entry?, h: Highlight?) {
                                         h?.let { high ->
                                             val language = entryList[high.x.toInt()].label
-                                            text3.text = if(language == null) text3.context.getString(
-                                                R.string.language,"None stated") else text3.context.getString(
-                                                R.string.language,language)
-                                            val detailUserList: ArrayList<DetailUser> = arrayListOf()
+                                            sharedViewModel.setLanguage(language)
+                                            val detailUserList: ArrayList<GitHubRepositoryUser> = arrayListOf()
                                             response.body()!!.forEach { item ->
                                                 if(item.language == language) {
-                                                    detailUserList.add(DetailUser(
+                                                    detailUserList.add(GitHubRepositoryUser(
                                                         id = item.id,
                                                         title = item.title,
                                                         html = item.html,
@@ -127,21 +163,23 @@ class DetailFragment: Fragment() {
                                                     ))
                                                 }
                                             }
-                                            val colorInfo =
-                                                ColorTemplate.COLORFUL_COLORS.toList()[high.x.toInt() % 5]
-                                            text3.setTextColor(colorInfo)
-                                            view1.setBackgroundColor(colorInfo)
-                                            sharedViewModel.detailUserList?.value = detailUserList
+                                            viewLifecycleOwner.lifecycleScope.launch {
+                                                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                                                    dao?.clearAll()
+                                                    dao?.insertAll(detailUserList)
+                                                }
+                                            }
+                                            sharedViewModel.setColorNum(ColorTemplate.COLORFUL_COLORS.toList()[high.x.toInt() % 5])
                                         }
 
                                     }
                                 })
 
                                 sharedViewModel.avatar?.let{ url ->
-                                    Glide.with(image2.context)
+                                    Glide.with(image1.context)
                                         .load(url)
                                         .circleCrop()
-                                        .into(image2)
+                                        .into(image1)
                                 }
                             }
                         } else {
@@ -154,6 +192,27 @@ class DetailFragment: Fragment() {
                     }
                 })
         }
+        sharedViewModel.language.observe(viewLifecycleOwner){
+            it?.let { language ->
+                text3.text = resources.getString(R.string.language, language)
+            } ?: let{
+                text3.text = resources.getString(R.string.init_language)
+            }
+        }
+
+        sharedViewModel.colorNum.observe(viewLifecycleOwner){
+            it?.let { color ->
+                text3.setTextColor(color)
+                view1.setBackgroundColor(color)
+            }
+        }
+
+        sharedViewModel.repos?.let {
+            text2.text = text2.context.getString(R.string.repos,it)
+        }
+        sharedViewModel.followers?.let {
+            text4.text = text3.context.getString(R.string.followers,it)
+        }
 
         val adapter = DetailUserAdapter(DetailUserAdapter.UserComparator)
         val recyclerView = binding.recyclerView1
@@ -164,16 +223,15 @@ class DetailFragment: Fragment() {
         itemDecoration.setDrawable(ColorDrawable(resources.getColor(R.color.black,null)))
         recyclerView.addItemDecoration(itemDecoration)
 
-        sharedViewModel.detailUserList?.observe(viewLifecycleOwner, {
-            adapter.submitList(it)
-        })
-
         sharedViewModel.html?.let{
-            val text2 = binding.textView2
-            val url = text2.context.getString(R.string.link,it)
-            text2.text = url
-            text2.setOnClickListener { v ->
+            image2.setOnClickListener { v ->
                 openUrl(it)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                dao?.getFlow()?.collectLatest(adapter::submitList)
             }
         }
     }

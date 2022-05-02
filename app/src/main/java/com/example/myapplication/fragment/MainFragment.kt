@@ -14,12 +14,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.R
 import com.example.myapplication.adapter.GitHubLoadStateAdapter
 import com.example.myapplication.adapter.GitHubUserAdapter
 import com.example.myapplication.data.GitHubUser
 import com.example.myapplication.databinding.FragmentMainBinding
+import com.example.myapplication.db.AppDatabase
 import com.example.myapplication.viewmodel.GitHubUserViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -59,8 +60,8 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
         swipe1.setOnRefreshListener {
             adapter.refresh()
         }
-        recyclerView1.layoutManager = GridLayoutManager(
-            activity,2, GridLayoutManager.VERTICAL,false
+        recyclerView1.layoutManager = LinearLayoutManager(
+            activity,LinearLayoutManager.VERTICAL,false
         )
         bindList(
             userLoadState = loadState,
@@ -75,14 +76,14 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
         pagingData: Flow<PagingData<GitHubUser>>
     ) {
         button1.setOnClickListener { adapter.retry() }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 pagingData.collectLatest(adapter::submitData)
             }
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 adapter.loadStateFlow.collect { loadState ->
                     userLoadState.loadState = loadState.mediator
                         ?.refresh
@@ -114,8 +115,8 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
             }
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 adapter.loadStateFlow
                     .distinctUntilChangedBy { it.refresh }
                     .filter { it.refresh is LoadState.NotLoading }
@@ -129,13 +130,23 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
         _binding = null
     }
 
-    override fun onItemClick(login: String?, html: String?, avatar: String?) {
+    override fun onItemClick(login: String?, html: String?, avatar: String?,repos: String?,followers: String?) {
         sharedViewModel.setLogin(login)
         sharedViewModel.setHtml(html)
         sharedViewModel.setAvatar(avatar)
-        sharedViewModel.detailUserList?.value = null
+        sharedViewModel.setRepos(repos)
+        sharedViewModel.setFollowers(followers)
+        sharedViewModel.setColorNum(null)
+        sharedViewModel.setLanguage(null)
+        val database = activity?.let { AppDatabase.getDatabase(it) }
+        val dao = database?.gitHubRepositoryDao()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                dao?.clearAll()
+            }
+        }
         val navHostFragment =
-            requireActivity().supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            activity?.supportFragmentManager?.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         val action = MainFragmentDirections.actionMainFragmentToDetailFragment()
         navController.navigate(action)

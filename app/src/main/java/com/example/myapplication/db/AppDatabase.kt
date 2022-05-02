@@ -5,12 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.myapplication.dao.GitHubDao
+import com.example.myapplication.dao.GitHubRepositoryDao
+import com.example.myapplication.data.GitHubRepositoryUser
 import com.example.myapplication.data.GitHubUser
 
-@Database(entities = [GitHubUser::class], version = 1, exportSchema = false)
+@Database(entities = [GitHubUser::class,GitHubRepositoryUser::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
-    abstract fun gitHubDao() : GitHubDao
+    abstract fun gitHubDao(): GitHubDao
+    abstract fun gitHubRepositoryDao(): GitHubRepositoryDao
 
     companion object {
         @Volatile
@@ -26,6 +29,7 @@ abstract class AppDatabase : RoomDatabase(){
                 context.applicationContext,
                 AppDatabase::class.java, "app_database"
             )
+                .fallbackToDestructiveMigration()
                 .build()
     }
 }
