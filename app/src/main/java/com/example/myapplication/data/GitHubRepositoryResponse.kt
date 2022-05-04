@@ -11,5 +11,5 @@ data class GitHubRepositoryResponse(
     @SerializedName("language") val language : String,
     @SerializedName("homepage") val homepage : String,
     @SerializedName("html_url") val html : String,
-    @SerializedName("stargazers_count") val star : Int
+    @SerializedName("stargazers_count") val star : Float
 )

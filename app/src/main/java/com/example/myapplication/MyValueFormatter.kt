@@ -1,7 +1,5 @@
 package com.example.myapplication
 
-import com.github.mikephil.charting.utils.ViewPortHandler
-
 import com.github.mikephil.charting.formatter.ValueFormatter
 import java.text.DecimalFormat
 

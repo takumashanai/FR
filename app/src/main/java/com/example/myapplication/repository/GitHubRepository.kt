@@ -1,5 +1,6 @@
 package com.example.myapplication.repository
 
+import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.Flow
 
 class GitHubRepository(
     private val service: GitHubUserAPI,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val context: Context
 ) {
     @OptIn(ExperimentalPagingApi::class)
     fun getSearchResultStream(query: Int): Flow<PagingData<GitHubUser>> {
@@ -26,7 +28,8 @@ class GitHubRepository(
             remoteMediator = GitHubRemoteMediator(
                 service,
                 database,
-                query
+                query,
+                context
             ),
             pagingSourceFactory = pagingSourceFactory
         ).flow

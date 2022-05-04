@@ -2,11 +2,16 @@
     <string name="app_name">GitHub User List</string>
     <string name="retry">retry</string>
     <string name="no_results">No results</string>
-    <string name="init_link">URL: </string>
+    <string name="init_description">Desc:</string>
     <string name="description">Desc: %1$s</string>
     <string name="language">Language: %1$s</string>
-    <string name="item">・ %1$s</string>
+    <string name="homepage">GitHub HP</string>
+    <string name="item">・%1$s</string>
     <string name="init_language">Language:</string>
-    <string name="link"><u>URL: %1$s</u></string>
     <string name="refresh">refresh</string>
+    <string name="init_repos">Repos</string>
+    <string name="repos">%1$sRepos</string>
+    <string name="init_followers">Followers</string>
+    <string name="followers">%1$sFollowers</string>
+    <string name="bio">bio:%1$s</string>
 </resources>
