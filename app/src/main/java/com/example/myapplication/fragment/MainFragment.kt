@@ -14,7 +14,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.window.layout.WindowMetricsCalculator
 import com.example.myapplication.R
 import com.example.myapplication.adapter.GitHubLoadStateAdapter
 import com.example.myapplication.adapter.GitHubUserAdapter
@@ -60,9 +62,28 @@ class MainFragment : Fragment(),GitHubUserAdapter.ItemClickListener {
         swipe1.setOnRefreshListener {
             adapter.refresh()
         }
-        recyclerView1.layoutManager = LinearLayoutManager(
-            activity,LinearLayoutManager.VERTICAL,false
-        )
+        val metrics = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(requireActivity())
+        val widthDp = metrics.bounds.width() /
+                resources.displayMetrics.density
+        when {
+            widthDp < 600f -> {
+                recyclerView1.layoutManager = LinearLayoutManager(
+                    activity,LinearLayoutManager.VERTICAL,false
+                )
+            }
+            widthDp < 840f -> {
+                recyclerView1.layoutManager = GridLayoutManager(
+                    activity,2,GridLayoutManager.VERTICAL,false
+                )
+            }
+            else -> {
+                recyclerView1.layoutManager = GridLayoutManager(
+                    activity,3,GridLayoutManager.VERTICAL,false
+                )
+            }
+        }
+
         bindList(
             userLoadState = loadState,
             adapter = adapter,

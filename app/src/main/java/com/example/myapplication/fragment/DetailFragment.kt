@@ -14,7 +14,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.window.layout.WindowMetricsCalculator
 import com.bumptech.glide.Glide
 import com.example.myapplication.*
 import com.example.myapplication.adapter.DetailUserAdapter
@@ -216,10 +218,24 @@ class DetailFragment: Fragment() {
 
         val adapter = DetailUserAdapter(DetailUserAdapter.UserComparator)
         val recyclerView = binding.recyclerView1
-        val layoutManager = LinearLayoutManager(activity,LinearLayoutManager.VERTICAL,false)
-        recyclerView.layoutManager = layoutManager
+        val metrics = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(requireActivity())
+        val widthDp = metrics.bounds.width() /
+                resources.displayMetrics.density
+        when {
+            widthDp < 600f -> {
+                recyclerView.layoutManager = LinearLayoutManager(
+                    activity,LinearLayoutManager.VERTICAL,false
+                )
+            }
+            else -> {
+                recyclerView.layoutManager = GridLayoutManager(
+                    activity,2, GridLayoutManager.VERTICAL,false
+                )
+            }
+        }
         recyclerView.adapter = adapter
-        val itemDecoration = DividerItemDecoration(activity,layoutManager.orientation)
+        val itemDecoration = DividerItemDecoration(activity,LinearLayoutManager.VERTICAL)
         itemDecoration.setDrawable(ColorDrawable(requireActivity().resources.getColor(R.color.black,null)))
         recyclerView.addItemDecoration(itemDecoration)
 
